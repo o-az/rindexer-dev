@@ -1,0 +1,33 @@
+{
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"biome.enabled": true,
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[dockerfile]": {
+		"editor.defaultFormatter": "ms-azuretools.vscode-docker"
+	},
+	"hadolint.hadolintPath": "hadolint",
+	"search.exclude": {
+		"**/_/**": true,
+		"**/dist/**": true,
+		"**/build/**": true,
+		"**/node_modules": true
+	},
+	"files.exclude": {
+		"**/*._*": true
+	},
+	"files.associations": {
+		".envrc": "dotenv"
+	}
+}

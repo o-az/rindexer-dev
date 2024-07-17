@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "mikestead.dotenv",
+    "tobermory.es6-string-html",
+    "EditorConfig.EditorConfig",
+    "yzhang.markdown-all-in-one",
+    "orta.vscode-twoslash-queries"
+  ],
+  "unwantedRecommendations": [
+    // we use biome for linting and formatting
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ]
+}

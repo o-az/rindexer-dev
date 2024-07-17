@@ -1,0 +1,42 @@
+# syntax = docker/dockerfile:1
+FROM rust:bookworm
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG DEBCONF_NOWARNINGS="yes"
+ARG DEBCONF_TERSE="yes"
+ARG LANG="C.UTF-8"
+
+WORKDIR /app
+
+RUN apt-get update --yes \
+  && apt-get upgrade --yes \
+  && apt-get install --yes --no-install-recommends \
+  ca-certificates \
+  curl \
+  unzip \
+  bash \
+  sudo \
+  openssl \
+  && apt-get autoremove --yes \
+  && apt-get clean --yes \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install rundexer
+RUN set -x && \
+  curl \
+  --fail \
+  --silent \
+  --location \
+  --show-error \
+  --url https://rindexer.xyz/install.sh | \
+  sed 's/curl -sSf -L "$RESOURCES_URL" -o "$RINDEXER_DIR\/resources.zip"/curl -sSf -L "$RESOURCES_URL" -o "$RINDEXER_DIR\/resources.zip" || echo "Failed to download resources.zip"/' | \
+  sed 's/unzip -o "$RINDEXER_DIR\/resources.zip"/[ -f "$RINDEXER_DIR\/resources.zip" ] \&\& unzip -o "$RINDEXER_DIR\/resources.zip" || echo "Skipping unzip, resources.zip not found"/' | \
+  sed 's/rm "$RINDEXER_DIR\/resources.zip"/rm -f "$RINDEXER_DIR\/resources.zip"/' | \
+  bash
+
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
