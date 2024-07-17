@@ -37,6 +37,12 @@ ARG DEBCONF_NOWARNINGS="yes"
 ARG DEBCONF_TERSE="yes"
 ARG LANG="C.UTF-8"
 
+# where rindexer.yaml and a JSON abi file are located
+# make sure the project path is in .dockerignore
+ARG PROJECT_PATH
+
+ENV PATH="/root/.rindexer/bin:${PATH}"
+
 WORKDIR /app
 
 RUN apt-get update --yes \
@@ -51,6 +57,7 @@ RUN apt-get update --yes \
 
 # Copy rindexer from builder stage
 COPY --from=builder /root/.rindexer /root/.rindexer
+COPY ${PROJECT_PATH} ${PROJECT_PATH}
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

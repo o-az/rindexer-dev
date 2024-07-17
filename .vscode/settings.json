@@ -25,7 +25,8 @@
 		"**/node_modules": true
 	},
 	"files.exclude": {
-		"**/*._*": true
+		"**/*._*": true,
+		".direnv": true
 	},
 	"files.associations": {
 		".envrc": "dotenv"

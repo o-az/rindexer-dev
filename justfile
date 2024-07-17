@@ -13,25 +13,60 @@ build:
   docker buildx build \
     --file='./Dockerfile' . \
     --platform='linux/amd64' \
-    --build-arg PORT='5173' \
-    --build-arg NODE_ENV='production' \
     --tag='rindexer-railway' \
     --label='rindexer-railway' \
     --progress='plain' \
-    --no-cache
+    --no-cache \
+    --build-arg="PROJECT_PATH=$PROJECT_PATH"
 
 [group("docker")]
 run:
   docker run \
-    --rm \
     -it \
+    --rm \
+    --pull='never' \
+    --publish-all \
+    --platform='linux/amd64' \
+    --name='rindexer-railway' \
+    --label='rindexer-railway' \
+    'rindexer-railway:latest' \
+    --env="DATABASE_URL=$DATABASE_URL" \
+    --env="POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+
+[group("docker")]
+run-command *command:
+  docker run \
+    -it \
+    --rm \
+    --pull='never' \
     --name='rindexer-railway' \
     --platform='linux/amd64' \
     --publish-all \
-    --env='PORT=5173' \
-    --env='NODE_ENV=production' \
+    --env="DATABASE_URL=$DATABASE_URL" \
+    --env="POSTGRES_PASSWORD=$POSTGRES_PASSWORD" \
     --label='rindexer-railway' \
-    'rindexer-railway:latest'
+    'rindexer-railway:latest' \
+    {{command}}
+
+
+[group("rindexer")]
+start-all:
+  rindexer start all
+
+[group("railway")]
+wipe-db-volume:
+  curl --request POST \
+    --url 'https://backboard.railway.app/graphql/v2' \
+    --header 'Content-Type: application/json' \
+    --header "Authorization: Bearer $RAILWAY_API_TOKEN" \
+    --data-raw '"query": "mutation { volumeInstanceWipe(volumeInstanceId: \"52c4d03d-6a64-42fe-b294-289be808e713\") }"'
+
+[group("graphql")]
+health:
+  curl --request POST \
+    --url 'http://localhost:3001/graphql' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{"query":"query HealthQuery { nodeId __typename }"}'
 
 #### ###### ###### ###### ###### ###### ###### ###### ###### ###### ###### ####
 
