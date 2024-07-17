@@ -8,50 +8,70 @@ pre:
 
 default: pre
 
+init:
+  test -f .env || cp .env.example .env
+
 [group("docker")]
-build:
+build-rindexer:
   docker buildx build \
     --file='./Dockerfile' . \
     --platform='linux/amd64' \
-    --tag='rindexer-railway' \
-    --label='rindexer-railway' \
+    --tag='rindexer' \
+    --label='rindexer' \
     --progress='plain' \
     --no-cache \
     --build-arg="PROJECT_PATH=$PROJECT_PATH"
 
 [group("docker")]
-run:
+run-rindexer:
   docker run \
     -it \
     --rm \
     --pull='never' \
     --publish-all \
     --platform='linux/amd64' \
-    --name='rindexer-railway' \
-    --label='rindexer-railway' \
-    'rindexer-railway:latest' \
+    --name='rindexer' \
+    --label='rindexer' \
+    'rindexer:latest' \
     --env="DATABASE_URL=$DATABASE_URL" \
     --env="POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
 
 [group("docker")]
-run-command *command:
+build-postgres:
+  docker buildx build \
+    --file='./database/Dockerfile' ./database \
+    --tag='rindexer-postgres' \
+    --label='rindexer-postgres' \
+    --progress='plain' \
+    --no-cache \
+    --build-arg="PORT=5440"
+
+[group("docker")]
+run-postgres:
+  docker run \
+    -it \
+    --rm \
+    --detach \
+    --pull='never' \
+    --publish='5440:5432' \
+    --name='rindexer-postgres' \
+    --label='rindexer-postgres' \
+    'rindexer-postgres:latest'
+
+[group("docker")]
+run-rindexer-command *command:
   docker run \
     -it \
     --rm \
     --pull='never' \
-    --name='rindexer-railway' \
+    --name='rindexer' \
     --platform='linux/amd64' \
     --publish-all \
     --env="DATABASE_URL=$DATABASE_URL" \
     --env="POSTGRES_PASSWORD=$POSTGRES_PASSWORD" \
-    --label='rindexer-railway' \
-    'rindexer-railway:latest' \
+    --label='rindexer' \
+    'rindexer:latest' \
     {{command}}
-
-
-[group("rindexer")]
-start-all:
-  rindexer start all
 
 [group("railway")]
 wipe-db-volume:
@@ -69,6 +89,11 @@ health:
     --data-raw '{"query":"query HealthQuery { nodeId __typename }"}'
 
 #### ###### ###### ###### ###### ###### ###### ###### ###### ###### ###### ####
+
+# https://docs.sqlfluff.com/en/stable/gettingstarted.html
+[group("lint")]
+lint-sql:
+  sqlfluff lint . --dialect=postgres
 
 [group("lint")]
 format:
@@ -96,7 +121,7 @@ format-nix:
 [group("lint")]
 fmt: format format-nix
 [group("lint")]
-fml: fmt lint
+fml: fmt lint lint-sql
 
 # does both format and lint checks
 [group("lint-check")]

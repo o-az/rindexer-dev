@@ -23,10 +23,13 @@
           pkgs.mkShell {
             buildInputs = [
               just
+              usql
               biome
               direnv
               railway
+              sqlfluff
               nixfmt-rfc-style
+              cargo-pgrx_0_11_3
             ];
           };
       }

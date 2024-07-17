@@ -1,0 +1,7 @@
+# ignore everything
+*
+
+# except the following
+!Dockerfile
+!init.sql
+!extensions.sql
