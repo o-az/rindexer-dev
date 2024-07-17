@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1
-FROM rust:bookworm
+FROM rust:bookworm AS builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -11,16 +11,10 @@ ARG LANG="C.UTF-8"
 WORKDIR /app
 
 RUN apt-get update --yes \
-  && apt-get upgrade --yes \
   && apt-get install --yes --no-install-recommends \
   ca-certificates \
   curl \
   unzip \
-  bash \
-  sudo \
-  openssl \
-  && apt-get autoremove --yes \
-  && apt-get clean --yes \
   && rm -rf /var/lib/apt/lists/*
 
 # Install rundexer
@@ -35,6 +29,28 @@ RUN set -x && \
   sed 's/unzip -o "$RINDEXER_DIR\/resources.zip"/[ -f "$RINDEXER_DIR\/resources.zip" ] \&\& unzip -o "$RINDEXER_DIR\/resources.zip" || echo "Skipping unzip, resources.zip not found"/' | \
   sed 's/rm "$RINDEXER_DIR\/resources.zip"/rm -f "$RINDEXER_DIR\/resources.zip"/' | \
   bash
+
+FROM debian:bookworm-slim AS runtime
+
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG DEBCONF_NOWARNINGS="yes"
+ARG DEBCONF_TERSE="yes"
+ARG LANG="C.UTF-8"
+
+WORKDIR /app
+
+RUN apt-get update --yes \
+  && apt-get install --yes --no-install-recommends \
+  ca-certificates \
+  bash \
+  sudo \
+  openssl \
+  && apt-get autoremove --yes \
+  && apt-get clean --yes \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy rindexer from builder stage
+COPY --from=builder /root/.rindexer /root/.rindexer
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

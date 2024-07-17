@@ -1,0 +1,28 @@
+name: Deploy rindexer
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  ACTIONS_RUNNER_DEBUG: true
+
+jobs:
+  deploy-rindexer:
+    name: 'Deploy rindexer'
+    runs-on: ['ubuntu-latest']
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+
+      - name: 'Install Railway CLI'
+        run: npm install --global @railway/cli@latest
+
+      - name: 'Deploy rindexer'
+        env:
+          RAILWAY_DOCKERFILE_PATH: './Dockerfile'
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service rindexer --detach
