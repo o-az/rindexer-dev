@@ -73,21 +73,6 @@ run-rindexer-command *command:
     'rindexer:latest' \
     {{command}}
 
-[group("railway")]
-wipe-db-volume:
-  curl --request POST \
-    --url 'https://backboard.railway.app/graphql/v2' \
-    --header 'Content-Type: application/json' \
-    --header "Authorization: Bearer $RAILWAY_API_TOKEN" \
-    --data-raw '"query": "mutation { volumeInstanceWipe(volumeInstanceId: \"52c4d03d-6a64-42fe-b294-289be808e713\") }"'
-
-[group("graphql")]
-health:
-  curl --request POST \
-    --url 'http://localhost:3001/graphql' \
-    --header 'Content-Type: application/json' \
-    --data-raw '{"query":"query HealthQuery { nodeId __typename }"}'
-
 #### ###### ###### ###### ###### ###### ###### ###### ###### ###### ###### ####
 
 # https://docs.sqlfluff.com/en/stable/gettingstarted.html
