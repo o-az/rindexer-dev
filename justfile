@@ -58,6 +58,10 @@ run-postgres:
     --label='rindexer-postgres' \
     'rindexer-postgres:latest'
 
+# TODO:
+# use `get-postgres-ip` to get the IP address of the postgres container
+# then use that to connect to the database
+
 [group("docker")]
 run-rindexer-command *command:
   docker run \
@@ -72,6 +76,10 @@ run-rindexer-command *command:
     --label='rindexer' \
     'rindexer:latest' \
     {{command}}
+
+[group("docker")]
+get-postgres-ip:
+  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rindexer-postgres
 
 #### ###### ###### ###### ###### ###### ###### ###### ###### ###### ###### ####
 
