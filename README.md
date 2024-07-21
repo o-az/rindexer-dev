@@ -54,13 +54,13 @@ you need two things:
 
 #### railway
 
-##### one click deployment:
+##### one click deployment
 
 TODO: add template url
 
 [![Deploy on Railway](https://railway.app/button.svg)]()
 
-##### manual deployment:
+##### manual deployment
 
 - create a project on [railway.app](https://railway.app?referralCode=eD4laT),
 - add a postgres database and a volume to the database,

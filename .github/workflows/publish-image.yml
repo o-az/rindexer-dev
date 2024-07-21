@@ -11,7 +11,7 @@ defaults:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: "rindexer"
+  IMAGE_NAME: ${{ github.repository }}
   ACTIONS_RUNNER_DEBUG: true
 
 jobs:
@@ -21,8 +21,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
+      attestations: write
       id-token: write
 
     steps:
@@ -42,6 +41,8 @@ jobs:
       # https://github.com/docker/setup-buildx-action
       - name: 'Set up Docker Buildx'
         uses: docker/setup-buildx-action@49a04d68900b1d260da9b3f06f52638d56cd8ad1 # v3.4.0
+        with:
+          platforms: linux/amd64
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
@@ -68,6 +69,7 @@ jobs:
         uses: docker/build-push-action@e050dfa622d93dfcc095192a984db567cb14f0f0 # v6.4.1
         with:
           context: .
+          file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

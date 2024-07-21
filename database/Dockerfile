@@ -4,13 +4,15 @@ FROM postgres:${POSTGRES_VERSION}
 
 ARG PORT=5440
 
-ENV POSTGRES_USER="postgres"
+ENV POSTGRES_PORT=${PORT}
+ENV POSTGRES_USERNAME="postgres"
 ENV POSTGRES_DATABASE="postgres"
 ENV POSTGRES_PASSWORD="rindexer"
-ENV POSTGRES_PORT=${PORT}
 
 RUN apt-get update --yes \
   && apt-get install --yes --no-install-recommends \
+  && apt-get autoremove --yes \
+  && apt-get clean --yes \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy initialization scripts

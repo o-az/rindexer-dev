@@ -44,7 +44,7 @@ build-postgres:
     --label='rindexer-postgres' \
     --progress='plain' \
     --no-cache \
-    --build-arg="PORT=5440"
+    --build-arg="PORT=${PORT:-5440}"
 
 [group("docker")]
 run-postgres:
@@ -79,7 +79,9 @@ run-rindexer-command *command:
 
 [group("docker")]
 get-postgres-ip:
-  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' rindexer-postgres
+  docker inspect \
+    --format='{{ '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' }}' \
+    rindexer-postgres
 
 #### ###### ###### ###### ###### ###### ###### ###### ###### ###### ###### ####
 
