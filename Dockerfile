@@ -15,6 +15,8 @@ RUN apt-get update --yes \
   ca-certificates \
   curl \
   unzip \
+  && apt-get autoremove --yes \
+  && apt-get clean --yes \
   && rm -rf /var/lib/apt/lists/*
 
 # Install rundexer
